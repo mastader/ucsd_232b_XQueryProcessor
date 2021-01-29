@@ -334,11 +334,26 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
     }
 
     private List<Node> unique(List<Node> nodes1, List<Node> nodes2) {
+        /*
         List<Node> tmp = new ArrayList<>();
         tmp.addAll(nodes1);
         tmp.addAll(nodes2);
         Set<Node> nodeSet = new HashSet<>(tmp);
         List<Node> res = new ArrayList<>(nodeSet);
+        */
+
+        List<Node> res = new ArrayList<>();
+        res.addAll(nodes1);
+
+        for (Node node2 : nodes2) {
+            Integer find = 0;
+            for (Node node : res) {
+                if (node.isSameNode(node2)) {
+                    find = 1;
+                }
+            }
+            if (find == 0) res.add(node2);
+        }
 
         return res;
     }
