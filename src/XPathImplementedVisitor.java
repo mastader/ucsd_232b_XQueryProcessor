@@ -1,13 +1,54 @@
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>{
+
+    private List<Node> currentNodes = new ArrayList<>();
+
+    private List<Node> readXML(String filename) {
+        List<Node> res = new ArrayList<>();
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = null;
+        try {
+            builder = factory.newDocumentBuilder();
+            String filepath = "test/" + filename;
+            Document doc = builder.parse(filepath);
+            res.add(doc);
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return res;
+    }
+
     @Override public List<Node> visitSingleSlashAP(XPathGrammarParser.SingleSlashAPContext ctx) {
+
+
         return visitChildren(ctx);
     }
 
     @Override public List<Node> visitDoubleSlashAP(XPathGrammarParser.DoubleSlashAPContext ctx) {
         System.out.println(ctx.FILENAME());
+        String filename = ctx.FILENAME().getText();
+        currentNodes = readXML(filename);
+
         return visitChildren(ctx);
     }
     /**
