@@ -40,7 +40,7 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
         List<Node> res = new ArrayList<>();
         List<Node> childrenNodes = getAllChildren(currentNodes);
         for (Node node : childrenNodes) {
-            System.out.println("TagRP: " + node.getNodeType());
+            //System.out.println("TagRP: " + node.getNodeType());
             if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().equals(ctx.TAGNAME().getText())) {
                 res.add(node);
             }
@@ -89,7 +89,7 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
     @Override public List<Node> visitAttributeRP(XPathGrammarParser.AttributeRPContext ctx) {
         List<Node> res = new ArrayList<>();
         String attr = ctx.ATTRNAME().getText().substring(1);
-        System.out.println("Attribute Name " + attr);
+        //System.out.println("Attribute Name " + attr);
 
         for (Node node : currentNodes) {
             NamedNodeMap nodemap = node.getAttributes();
@@ -109,8 +109,9 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
 
     @Override public List<Node> visitSingleSlashRP(XPathGrammarParser.SingleSlashRPContext ctx) {
         visit(ctx.rp(0));
-        List<Node> tmp = new ArrayList<>(currentNodes);
-        List<Node> res = unique(tmp, visit(ctx.rp(1)));
+        visit(ctx.rp(1));
+
+        List<Node> res = unique(new ArrayList<>(), currentNodes);
 
         currentNodes = res;
         return res;
@@ -162,10 +163,13 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
 
     @Override public List<Node> visitConstantFilter(XPathGrammarParser.ConstantFilterContext ctx) {
         List<Node> res = new ArrayList<>();
+        visit(ctx.rp());
+        String strconstant = ctx.STRINGCONSTANT().getText();
+
+        strconstant = strconstant.substring(1, strconstant.length() - 1);
 
         for (Node node : currentNodes) {
-            String strconstant = ctx.STRINGCONSTANT().getText();
-            if (node.getTextContent() == strconstant.substring(1, strconstant.length() - 1)) {
+            if (node.getNodeType() == Node.TEXT_NODE && node.getNodeValue().equals(strconstant)) {
                 res.add(node);
             }
         }
@@ -219,11 +223,21 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
 
     @Override public List<Node> visitAndFilter(XPathGrammarParser.AndFilterContext ctx) {
         List<Node> res = new ArrayList<>();
+
         List<Node> tmp = new ArrayList<>(currentNodes);
         List<Node> re1 = visit(ctx.f(0));
+        //System.out.println(re1.size());
         currentNodes = tmp;
         List<Node> re2 = visit(ctx.f(1));
+        //System.out.println(re2.size() + "\n");
 
+        if (re1.size() != 0 && re2.size() != 0) {
+            return currentNodes;
+        }
+        else {
+            return new ArrayList<>();
+        }
+        /*
         for (Node node1 : re1) {
             for (Node node2 : re2) {
                 if (node1.isSameNode(node2)) {
@@ -233,7 +247,9 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
         }
 
         currentNodes = res;
+
         return res;
+        */
     }
 
     @Override public List<Node> visitOrFilter(XPathGrammarParser.OrFilterContext ctx) {
@@ -251,8 +267,17 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
     @Override public List<Node> visitNotFilter(XPathGrammarParser.NotFilterContext ctx) {
         List<Node> res = new ArrayList<>(currentNodes);
         List<Node> notNode = visit(ctx.f());
-        currentNodes = res;
 
+        if (notNode.size() != 0) {
+            return new ArrayList<>();
+        }
+        else {
+            return res;
+        }
+
+        // currentNodes = res;
+
+        /*
         for (Node node1 : currentNodes) {
             for (Node node2 : notNode) {
                 if (node1.isSameNode(node2) == true) {
@@ -263,12 +288,15 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
 
         currentNodes = res;
         return res;
+        */
+
     }
 
     private List<Node> readXML(String filename) {
         List<Node> res = new ArrayList<>();
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setIgnoringElementContentWhitespace(true);
         DocumentBuilder builder;
         try {
             builder = factory.newDocumentBuilder();
@@ -327,6 +355,7 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
     private List<Node> getNodeDescendants(Node node) {
         List<Node> descendants = new ArrayList<>();
         int len = node.getChildNodes().getLength();
+        descendants.add(node);
         for(int i = 0; i < len; i++){
             descendants.addAll(getNodeDescendants(node.getChildNodes().item(i)));
         }
