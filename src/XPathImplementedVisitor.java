@@ -1,7 +1,7 @@
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import java.util.ArrayList;
 import org.xml.sax.SAXException;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,17 +21,13 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
         List<Node> res = new ArrayList<>();
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = null;
+        DocumentBuilder builder;
         try {
             builder = factory.newDocumentBuilder();
             String filepath = "test/" + filename;
             Document doc = builder.parse(filepath);
             res.add(doc);
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -39,16 +35,14 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
     }
 
     @Override public List<Node> visitSingleSlashAP(XPathGrammarParser.SingleSlashAPContext ctx) {
-
-
-        return visitChildren(ctx);
+        return visit(ctx.rp());
     }
 
     @Override public List<Node> visitDoubleSlashAP(XPathGrammarParser.DoubleSlashAPContext ctx) {
-        System.out.println(ctx.FILENAME());
+        String fileName = ctx.FILENAME().getText();
+        visit(ctx.rp());
         String filename = ctx.FILENAME().getText();
         currentNodes = readXML(filename);
-
         return visitChildren(ctx);
     }
     /**
@@ -184,4 +178,22 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
      * {@link #visitChildren} on {@code ctx}.</p>
      */
     @Override public List<Node> visitOrFilter(XPathGrammarParser.OrFilterContext ctx) { return visitChildren(ctx); }
+
+    private List<Node> getListDescendants(List<Node> nodes) {
+        List<Node> descendants = new ArrayList<>();
+        int len = nodes.size();
+        for(int i = 0; i < len; i++){
+            descendants.addAll(getNodeDescendants(nodes.get(i)));
+        }
+        return descendants;
+    }
+
+    private List<Node> getNodeDescendants(Node node) {
+        List<Node> descendants = new ArrayList<>();
+        int len = node.getChildNodes().getLength();
+        for(int i = 0; i < len; i++){
+            descendants.addAll(getNodeDescendants(node.getChildNodes().item(i)));
+        }
+        return descendants;
+    }
 }
