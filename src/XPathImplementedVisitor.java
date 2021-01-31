@@ -300,7 +300,7 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
         DocumentBuilder builder;
         try {
             builder = factory.newDocumentBuilder();
-            String filepath = "test/" + filename;
+            String filepath = filename;
             Document doc = builder.parse(filepath);
             res.add(doc);
         } catch (Exception e) {

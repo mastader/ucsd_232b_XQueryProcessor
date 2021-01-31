@@ -1,5 +1,4 @@
 import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -8,20 +7,17 @@ import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.List;
 
 public class XPathEvaluator {
     public static void main(String[] args) {
         try {
             // Generate tree and visitor
-            CharStream ANTLRInput = CharStreams.fromFileName("test/XPathTest.txt");
+            CharStream ANTLRInput = CharStreams.fromFileName(args[0]);
             XPathGrammarLexer lexer = new XPathGrammarLexer(ANTLRInput);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             XPathGrammarParser parser = new XPathGrammarParser(tokens);
@@ -38,8 +34,8 @@ public class XPathEvaluator {
 
             Node tmp = doc.createElement("result");
             for (Node node : res) {
-                Node copy = doc.importNode(node, true);
-                tmp.appendChild(copy);
+                Node deepcopy = doc.importNode(node, true);
+                tmp.appendChild(deepcopy);
             }
             doc.appendChild(tmp);
 
@@ -50,7 +46,7 @@ public class XPathEvaluator {
             DOMSource source = new DOMSource(doc);
 
             //StreamResult console = new StreamResult(System.out);
-            StreamResult file = new StreamResult(new File("out/create.xml"));
+            StreamResult file = new StreamResult(new File("./output.xml"));
 
             //transformer.transform(source, console);
             transformer.transform(source, file);
