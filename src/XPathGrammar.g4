@@ -1,7 +1,8 @@
 grammar XPathGrammar;
 
-ap                  : 'doc("' FILENAME '")/' rp     #SingleSlashAP
-                    | 'doc("' FILENAME '")//' rp    #DoubleSlashAP;
+ap                  : 'document(' FILENAME ')/' rp     #SingleSlashAP
+                    | 'document(' FILENAME ')//' rp    #DoubleSlashAP;
+
 rp                  : TAGNAME                       #TagRP
                     | '*'                           #AllChildrenRP
                     | '.'                           #SelfRP
@@ -29,6 +30,6 @@ fragment DIGIT      : [0-9];
 TAGNAME             : TEXT;
 ATTRNAME            : '@' TEXT;
 TEXT                : (LOWERCASE | UPPERCASE | DIGIT | '_')+;
-FILENAME            : TEXT '.' TEXT;
-STRINGCONSTANT      : '"' TEXT '"';
+FILENAME            : '"' TEXT '.' TEXT '"';
+STRINGCONSTANT      : '"' (~'"')* '"';
 WHITESPACE          : [ \t\r\n]+ -> skip;

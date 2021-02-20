@@ -23,6 +23,7 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
 
     @Override public List<Node> visitSingleSlashAP(XPathGrammarParser.SingleSlashAPContext ctx) {
         String filename = ctx.FILENAME().getText();
+        filename = filename.substring(1, filename.length() - 1);
         currentNodes = readXML(filename);
 
         return visit(ctx.rp());
@@ -30,6 +31,7 @@ public class XPathImplementedVisitor extends XPathGrammarBaseVisitor<List<Node>>
 
     @Override public List<Node> visitDoubleSlashAP(XPathGrammarParser.DoubleSlashAPContext ctx) {
         String filename = ctx.FILENAME().getText();
+        filename = filename.substring(1, filename.length() - 1);
         currentNodes = readXML(filename);
         currentNodes.addAll(getListDescendants(currentNodes));
 
