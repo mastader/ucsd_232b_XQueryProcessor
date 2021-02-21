@@ -17,7 +17,7 @@ whereClause         : 'where' cond;
 returnClause        : 'return' xq;
 cond                : xq ('=' | 'eq') xq                                    #EqualCond
                     | xq ('==' | 'is') xq                                   #IsCond
-                    | 'empty(' xq ')'                                       #EmptyCond
+                    | 'empty' '(' xq ')'                                       #EmptyCond
                     | 'some' (VAR 'in' xq (',')?)+ 'satisfies' cond         #MultipleCond
                     | '(' cond ')'                                          #BracketCond
                     | cond 'and' cond                                       #AndCond
