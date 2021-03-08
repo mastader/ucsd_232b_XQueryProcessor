@@ -120,6 +120,8 @@ public class XQueryImplementedVisitor extends XQueryGrammarBaseVisitor<List<Node
 
         if (context.containsKey(var)) {
             currentNodes = new ArrayList<>(context.get(var));
+            System.out.println("key find" + var);
+            System.out.println("size" + context.get(var).size());
         }
         else {
             currentNodes = new ArrayList<>();
@@ -180,7 +182,6 @@ public class XQueryImplementedVisitor extends XQueryGrammarBaseVisitor<List<Node
     }
 
     @Override public List<Node> visitDoubleSlashXQ(XQueryGrammarParser.DoubleSlashXQContext ctx) {
-
         visit(ctx.xq());
         currentNodes.addAll(getListDescendants(currentNodes));
         currentNodes = visit(ctx.rp());
@@ -268,7 +269,6 @@ public class XQueryImplementedVisitor extends XQueryGrammarBaseVisitor<List<Node
     @Override public List<Node> visitLetClause(XQueryGrammarParser.LetClauseContext ctx) {
         int len = ctx.VAR().size();
         for(int i = 0; i < len; i++) {
-            //System.out.println("update Context");
             context.put(ctx.VAR(i).getText(), visit(ctx.xq(i)));
         }
 
