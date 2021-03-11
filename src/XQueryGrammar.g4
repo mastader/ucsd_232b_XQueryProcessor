@@ -5,19 +5,22 @@ xq                  : VAR                                                   #Var
                     | STRINGCONSTANT                                        #StringXQ
                     | ap                                                    #ApXQ
                     | '(' xq ')'                                            #BracketXQ
-                    | xq ',' xq                                             #SequenceXQ
                     | xq '/' rp                                             #SingleSlashXQ
                     | xq '//' rp                                            #DoubleSlashXQ
-                    | '<' TAGNAME '>' '{' xq '}' '</' TAGNAME '>'           #TagXQ
+                    | xq ',' xq                                             #SequenceXQ
+                    | '<' TAGNAME '>' ('{')? xq ('}')? '</' TAGNAME '>'     #TagXQ
                     | forClause (letClause)? (whereClause)? returnClause    #FlworXQ
-                    | letClause xq                                          #LetClauseXQ;
+                    | letClause xq                                          #LetClauseXQ
+                    | joinClause                                            #JoinXQ;
+joinClause          : 'join' '(' xq ',' xq ',' idList ',' idList ')';
+idList              : '[' TAGNAME (',' TAGNAME)* ']';
 forClause           : 'for' VAR 'in' xq (',' VAR 'in' xq)*;
 letClause           : 'let' VAR ':=' xq (',' VAR ':=' xq)*;
 whereClause         : 'where' cond;
 returnClause        : 'return' xq;
 cond                : xq ('=' | 'eq') xq                                    #EqualCond
                     | xq ('==' | 'is') xq                                   #IsCond
-                    | 'empty' '(' xq ')'                                       #EmptyCond
+                    | 'empty' '(' xq ')'                                    #EmptyCond
                     | 'some' (VAR 'in' xq (',')?)+ 'satisfies' cond         #MultipleCond
                     | '(' cond ')'                                          #BracketCond
                     | cond 'and' cond                                       #AndCond

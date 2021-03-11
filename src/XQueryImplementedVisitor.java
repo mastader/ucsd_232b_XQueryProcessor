@@ -1,6 +1,8 @@
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.w3c.dom.*;
 
+import java.io.StringWriter;
 import java.sql.SQLOutput;
 import java.util.*;
 
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 public class XQueryImplementedVisitor extends XQueryGrammarBaseVisitor<List<Node>> {
 
     private HashMap<String, List<Node>> context = new HashMap<>();
+    LinkedList<String> idList = new LinkedList<>();
 
     private List<Node> currentNodes = new ArrayList<>();
 
@@ -120,8 +123,8 @@ public class XQueryImplementedVisitor extends XQueryGrammarBaseVisitor<List<Node
 
         if (context.containsKey(var)) {
             currentNodes = new ArrayList<>(context.get(var));
-            System.out.println("key find" + var);
-            System.out.println("size" + context.get(var).size());
+            // System.out.println("key find" + var);
+            // System.out.println("size" + context.get(var).size());
         }
         else {
             currentNodes = new ArrayList<>();
@@ -260,6 +263,136 @@ public class XQueryImplementedVisitor extends XQueryGrammarBaseVisitor<List<Node
 
         return res;
     }
+
+    @Override public List<Node> visitJoinXQ(XQueryGrammarParser.JoinXQContext ctx) {
+        return visit(ctx.joinClause());
+    }
+
+    @Override public List<Node> visitJoinClause(XQueryGrammarParser.JoinClauseContext ctx) {
+        List<Node> tmp = currentNodes;
+        List<Node> left_res = visit(ctx.xq(0));
+        currentNodes = tmp;
+        List<Node> right_res = visit(ctx.xq(1));
+
+        List<TerminalNode> left_keys = ctx.idList(0).TAGNAME();
+        List<TerminalNode> right_keys = ctx.idList(1).TAGNAME();
+        System.out.println(left_keys.size());
+        System.out.println(right_keys.size());
+        HashMap<String, LinkedList<Node>> eq = new HashMap<>();
+
+        for (Node r : right_res) {
+            String compareKey = tupleToMap(r, right_keys);
+            if (!eq.containsKey(compareKey)) {
+                System.out.println("do not contain key");
+                eq.put(compareKey, new LinkedList<>());
+            }
+
+            eq.get(compareKey).add(r);
+        }
+        System.out.println(eq.size());
+
+        List<Node> ret = new LinkedList<>();
+        for (Node l : left_res) {
+            String compareKey = tupleToMap(l, left_keys);
+            System.out.println("a");
+            // System.out.println(compareKey.size());
+            // System.out.println(nodeToString(compareKey.get(0)));
+            // check
+            /*
+            Boolean found = false;
+            for (LinkedList<Node> nodeList : eq.keySet()) {
+                Integer t = 1;
+                for (int i = 0; i < nodeList.size(); i++) {
+                    if (!nodeList.get(i).equals(compareKey.get(i))) {
+                        t = 0;
+                        break;
+                    }
+                }
+
+                if (t == 1) {
+                    found = true;
+                    System.out.println("find");
+                    break;
+                }
+            }
+            */
+            //System.out.println(compareKey.toString());
+            /*
+            System.out.println("b");
+            Boolean found = false;
+            for (String key : eq.keySet()) {
+                // System.out.println(nodelist.size());
+                System.out.println(nodeToString(nodelist.get(0)));
+                if (nodeListToString(nodelist).equals(nodeListToString(compareKey))) {
+                    found = true;
+                    break;
+                }
+            }
+            */
+            if (eq.containsKey(compareKey)) {
+                System.out.println("find");
+                LinkedList<Node> rightValues = eq.get(compareKey);
+                for (Node r : rightValues) {
+                    LinkedList<Node> joining = new LinkedList<>();
+                    List<Node> left_list = new ArrayList<>();
+                    List<Node> right_list = new ArrayList<>();
+                    left_list.add(l);
+                    right_list.add(r);
+                    joining.addAll(getAllChildren(left_list));
+                    joining.addAll(getAllChildren(right_list));
+                    ret.add(makeElem(l.getNodeName(), joining));
+                }
+            }
+
+        }
+
+        currentNodes = ret;
+        return currentNodes;
+    }
+
+    private String tupleToMap(Node tuple, List<TerminalNode> keys) {
+        //LinkedList<Node> allNodes = new LinkedList<>();
+        String res = "";
+        List<Node> tmp = new ArrayList<>();
+        tmp.add(tuple);
+        List<Node> children = getAllChildren(tmp);
+
+        for (TerminalNode key : keys) {
+            for (Node child : children) {
+
+                if (child.getNodeName().equals(key.getText())) {
+                    List<Node> temp = new ArrayList<>();
+                    temp.add(child);
+                    res += nodeListToString(getAllChildren(temp));
+                    // allNodes.addAll(getAllChildren(temp));
+                }
+            }
+        }
+        return res;
+    }
+
+    private String nodeListToString(List<Node> nodes) {
+        String ret = "";
+        for (int i = 0; i < nodes.size(); i++) {
+            ret += nodeToString(nodes.get(i)) + "\n";
+        }
+        return ret;
+    }
+
+    private String nodeToString(Node inputNode) {
+        StringWriter sw = new StringWriter();
+        try {
+            Transformer t = TransformerFactory.newInstance().newTransformer();
+            t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            t.setOutputProperty(OutputKeys.INDENT, "yes");
+            t.transform(new DOMSource(inputNode), new StreamResult(sw));
+        } catch (TransformerException te) {
+            System.out.println("NodeToString Exception");
+        }
+        return sw.toString();
+    }
+
+    @Override public List<Node> visitIdList(XQueryGrammarParser.IdListContext ctx) { return visitChildren(ctx); }
 
     @Override public List<Node> visitForClause(XQueryGrammarParser.ForClauseContext ctx) {
 

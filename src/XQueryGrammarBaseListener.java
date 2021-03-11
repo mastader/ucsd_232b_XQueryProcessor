@@ -51,6 +51,18 @@ public class XQueryGrammarBaseListener implements XQueryGrammarListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterJoinXQ(XQueryGrammarParser.JoinXQContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitJoinXQ(XQueryGrammarParser.JoinXQContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterVarXQ(XQueryGrammarParser.VarXQContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -130,6 +142,30 @@ public class XQueryGrammarBaseListener implements XQueryGrammarListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitDoubleSlashXQ(XQueryGrammarParser.DoubleSlashXQContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterJoinClause(XQueryGrammarParser.JoinClauseContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitJoinClause(XQueryGrammarParser.JoinClauseContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterIdList(XQueryGrammarParser.IdListContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIdList(XQueryGrammarParser.IdListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
