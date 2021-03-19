@@ -4,9 +4,9 @@ import XPathGrammar;
 xq                  : VAR                                                   #VarXQ
                     | STRINGCONSTANT                                        #StringXQ
                     | ap                                                    #ApXQ
-                    | '(' xq ')'                                            #BracketXQ
                     | xq '/' rp                                             #SingleSlashXQ
                     | xq '//' rp                                            #DoubleSlashXQ
+                    | '(' xq ')'                                            #BracketXQ
                     | xq ',' xq                                             #SequenceXQ
                     | '<' TAGNAME '>' ('{')? xq ('}')? '</' TAGNAME '>'     #TagXQ
                     | forClause (letClause)? (whereClause)? returnClause    #FlworXQ

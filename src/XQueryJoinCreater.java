@@ -200,6 +200,16 @@ public class XQueryJoinCreater extends XQuerySerializer{
                 }
             }
             */
+            /*
+            for (String key : equalities.keySet()) {
+                System.out.println("Key");
+                System.out.println(key);
+                System.out.println("Value");
+                System.out.println(equalities.get(key));
+            }
+            System.out.println(joinedVars);
+            */
+
             for (String joinedVar : joinedVars) {
                 if (equalities.containsKey(joinedVar)) {
                     for (String v : equalities.get(joinedVar)) {
@@ -210,11 +220,17 @@ public class XQueryJoinCreater extends XQuerySerializer{
                                 equalities.get(joinedVar).remove(v);
                             }
                         }
-                        if (equalities.keySet().contains(v)) {
-                            if (compareVars.contains(joinedVar)) {
-                                leftJoin.add(joinedVar.substring(1));
-                                rightJoin.add(v.substring(1));
-                                equalities.get(v).remove(joinedVar);
+                    }
+                } else {
+                    for (String key : equalities.keySet()) {
+                        HashSet<String> value = equalities.get(key);
+                        for (String v : value) {
+                            if (v.equals(joinedVar)) {
+                                if (compareVars.contains(key)) {
+                                    leftJoin.add(v.substring(1));
+                                    rightJoin.add(key.substring(1));
+                                    equalities.get(key).remove(v);
+                                }
                             }
                         }
                     }

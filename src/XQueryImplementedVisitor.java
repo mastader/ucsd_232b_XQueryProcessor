@@ -276,25 +276,25 @@ public class XQueryImplementedVisitor extends XQueryGrammarBaseVisitor<List<Node
 
         List<TerminalNode> left_keys = ctx.idList(0).TAGNAME();
         List<TerminalNode> right_keys = ctx.idList(1).TAGNAME();
-        System.out.println(left_keys.size());
-        System.out.println(right_keys.size());
+        //System.out.println(left_keys.size());
+        //System.out.println(right_keys.size());
         HashMap<String, LinkedList<Node>> eq = new HashMap<>();
 
         for (Node r : right_res) {
             String compareKey = tupleToMap(r, right_keys);
             if (!eq.containsKey(compareKey)) {
-                System.out.println("do not contain key");
+            //  System.out.println("do not contain key");
                 eq.put(compareKey, new LinkedList<>());
             }
 
             eq.get(compareKey).add(r);
         }
-        System.out.println(eq.size());
+        // System.out.println(eq.size());
 
         List<Node> ret = new LinkedList<>();
         for (Node l : left_res) {
             String compareKey = tupleToMap(l, left_keys);
-            System.out.println("a");
+            // System.out.println("a");
             // System.out.println(compareKey.size());
             // System.out.println(nodeToString(compareKey.get(0)));
             // check
@@ -330,7 +330,7 @@ public class XQueryImplementedVisitor extends XQueryGrammarBaseVisitor<List<Node
             }
             */
             if (eq.containsKey(compareKey)) {
-                System.out.println("find");
+                // System.out.println("find");
                 LinkedList<Node> rightValues = eq.get(compareKey);
                 for (Node r : rightValues) {
                     LinkedList<Node> joining = new LinkedList<>();

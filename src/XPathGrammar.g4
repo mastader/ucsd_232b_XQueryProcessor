@@ -1,7 +1,7 @@
 grammar XPathGrammar;
 
-ap                  : ('doc' | 'document') '(' FILENAME ')/' rp     #SingleSlashAP
-                    | ('doc' | 'document') '(' FILENAME ')//' rp    #DoubleSlashAP;
+ap                  : ('doc' | 'document') '(' FILENAME ')' '/' rp     #SingleSlashAP
+                    | ('doc' | 'document') '(' FILENAME ')' '//' rp    #DoubleSlashAP;
 
 rp                  : TAGNAME                       #TagRP
                     | '*'                           #AllChildrenRP
@@ -9,9 +9,9 @@ rp                  : TAGNAME                       #TagRP
                     | '..'                          #ParentRP
                     | 'text()'                      #TextRP
                     | ATTRNAME                      #AttributeRP
-                    | '(' rp ')'                    #BracketRP
                     | rp '/' rp                     #SingleSlashRP
                     | rp '//' rp                    #DoubleSlashRP
+                    | '(' rp ')'                    #BracketRP
                     | rp '[' f ']'                  #FilteredRP
                     | rp ',' rp                     #SequenceRP;
 f                   : rp                            #RPFilter
